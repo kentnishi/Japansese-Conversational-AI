@@ -1,5 +1,5 @@
-import { NextRespone } from 'next/server';
-import OpenAI from 'openai' 
+import { NextResponse } from 'next/server';
+import OpenAI from 'openai';
 
 const systemPrompt = `You are a friendly and patient Japanese conversational chatbot designed to help users practice their Japanese language skills. 
 Engage in natural, everyday conversations, offering helpful corrections and explanations when necessary. Encourage the user to express themselves in Japanese, 
@@ -9,11 +9,11 @@ export async function POST(req){
     const openai = new OpenAI()
     const data = await req.json()
 
-    const completition = await openai.chat.completions.create({
+    const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         stream: true,
-        message: [{
-            roles: 'system',
+        messages: [{
+            role: 'system',
             content: systemPrompt,
         },
         ...data,
@@ -24,7 +24,7 @@ export async function POST(req){
         async start(controller){
             const encoder = new TextEncoder()
             try{
-                for await (const chunk of completition){
+                for await (const chunk of completion){
                     const content = chunk.choices[0]?.delta?.content
                     if (content){
                         const text = encoder.encode(content)
@@ -39,7 +39,7 @@ export async function POST(req){
         },
     })
 
-    return new NextRespone(stream)
+    return new NextResponse(stream)
 
 }
 
